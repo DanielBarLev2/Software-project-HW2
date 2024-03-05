@@ -28,22 +28,29 @@ def sys_arguments():
     return k, iter, eps, file_name_1, file_name_2
 
 
-def inner_join(file_1, file_2):
+def inner_join(file_name_1, file_name_2):
 
-    data1 = pd.read_csv(file_1,  header=None)
-    data2 = pd.read_csv(file_2,  header=None)
+    data1 = pd.read_csv(file_name_1,  header=None)
+    data2 = pd.read_csv(file_name_2,  header=None)
 
     sorted_result = pd.merge(data1, data2, on=data1.columns[0], how='inner').sort_values(by=0)
 
     return sorted_result
 
 
-if __name__ == "__main__":
-    file_name_1 = "tests/input_1_db_1.txt"
-    file_name_2 = "tests/input_1_db_2.txt"
-    joined_data = inner_join(file_name_1, file_name_2)
+def initialize_centroid(vector_list: np.ndarray) -> np.ndarray:
+    
 
-    print(joined_data)
+
+if __name__ == "__main__":
+    file_1 = "tests/input_1_db_1.txt"
+    file_2 = "tests/input_1_db_2.txt"
+    joined_data = inner_join(file_1, file_2)
+
+    data = joined_data[joined_data.columns[1:]]
+    vector_list = data.values
+    print(vector_list)
+
 
 
 
