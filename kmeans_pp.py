@@ -29,18 +29,20 @@ def sys_arguments():
 
 
 def inner_join(file_1, file_2):
-    data1 = pd.read_csv(file_1)
-    data2 = pd.read_csv(file_2)
 
-    result = pd.merge(data1, data2, on=data1.columns[0], how='inner')
+    data1 = pd.read_csv(file_1,  header=None)
+    data2 = pd.read_csv(file_2,  header=None)
 
-    return result
+    sorted_result = pd.merge(data1, data2, on=data1.columns[0], how='inner').sort_values(by=0)
+
+    return sorted_result
 
 
 if __name__ == "__main__":
-    file_name_1 = "file1.csv"
-    file_name_2 = "file2.csv"
+    file_name_1 = "tests/input_1_db_1.txt"
+    file_name_2 = "tests/input_1_db_2.txt"
     joined_data = inner_join(file_name_1, file_name_2)
+
     print(joined_data)
 
 
