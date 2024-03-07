@@ -114,11 +114,11 @@ def initialize_centroid(vectors_list, k: int) -> np.ndarray:
 
 
 def kmeans():
-    # to run in cmd use: main.py k n d "tests/input_1_db_1.txt" "tests/input_1_db_2.txt"
+    # to run in cmd use: main.py k n d "input++/input_1_db_1.txt" "input++/input_1_db_2.txt"
     # k, iter, eps, file_name_1, file_name_2 = sys_arguments()
 
     # to run internally:
-    k, iter, eps, file_name_1, file_name_2 = 3, 0, 0, "tests/input_1_db_1.txt", "tests/input_1_db_2.txt"
+    k, iter, eps, file_name_1, file_name_2 = 3, 0, 0, "input++/input_1_db_1.txt", "input++/input_1_db_2.txt"
 
     data = inner_join(file_name_1, file_name_2)
 
@@ -127,3 +127,7 @@ def kmeans():
     centroids_list = initialize_centroid(vectors_list=vectors_list, k=k)
 
     print(centroids_list)
+
+
+if __name__ == "__main__":
+    kmeans()
