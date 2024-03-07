@@ -6,6 +6,8 @@
 #include "vector.h"
 #include "vector.c"
 
+# include "cap.h"
+
 #define MAX_ROW_LEN 512
 
 // Define bool type if not already defined
@@ -215,7 +217,7 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
 }
 
 // Function to perform K-means clustering
-void Kmeans(const char *filename, int k, int n, int d, int maxIter) {
+Vector* Kmeans(const char *filename, int k, int n, int d, int maxIter) {
     // Set default value for max_iter if not provided
     if (maxIter <= 0)
         maxIter = 200;
@@ -258,35 +260,22 @@ void Kmeans(const char *filename, int k, int n, int d, int maxIter) {
         centroidList = updatedCentroidsList;
     }
 
-    // Print final centroids
-    for (int i = 0; i < k; i++) {
-        printf("Centroid %d (", i + 1);
-        printVector(centroidList[i]);
-    }  
-    printf("\n");
-
-    // Free memory allocated for vectors and centroids
-    for (int i = 0; i < n; i++) {
-        free(vectorList[i].components);
-    }
-    free(vectorList);
-    free(centroidList);
+    return centroidList;
 }
 
 // Main function; Performs K-means clustering
 int main(int argc, char *argv[]) {
-    if (argc == 5 || argc == 6) {
-        int k = atoi(argv[1]);
-        int n = atoi(argv[2]);
-        int d = atoi(argv[3]);
+    if (argc == 6 || argc == 5) {
+        const char *filename = argv[1];
+        int k = atoi(argv[2]);
+        int n = atoi(argv[3]);
+        int d = atoi(argv[4]);
         int maxIter = 200;
-        const char *filename = argv[argc - 1]; 
-
-        if (argc == 6) {
-            maxIter = atoi(argv[4]);
+        if (argc == 6){
+            int maxIter = atoi(argv[5]);
         }
-
-        Kmeans(k, n, d, maxIter, filename);
+        
+        return Kmeans(filename, k, n, d, maxIter);
     }
     else {
         printf("Usage: %s <k> <n> <d> [maxIter] <filename>\n", argv[0]);
