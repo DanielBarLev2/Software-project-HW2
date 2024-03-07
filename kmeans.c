@@ -273,34 +273,25 @@ void Kmeans(const char *filename, int k, int n, int d, int maxIter) {
     free(centroidList);
 }
 
-// Main function; Perform K-means clustering
-int main() {
-    // ### from inputs
-    // Kmeans("input_1.txt", 3, 800, 3, 600);
-    // Kmeans("input_2.txt", 7, 430, 11, 0);
-    // Kmeans("input_3.txt", 15, 5000, 5, 300);
+// Main function; Performs K-means clustering
+int main(int argc, char *argv[]) {
+    if (argc == 5 || argc == 6) {
+        int k = atoi(argv[1]);
+        int n = atoi(argv[2]);
+        int d = atoi(argv[3]);
+        int maxIter = 200;
+        const char *filename = argv[argc - 1]; 
 
-    char filename[100];
-    int k, n, d, maxIter;
+        if (argc == 6) {
+            maxIter = atoi(argv[4]);
+        }
 
-    // Prompt user to enter inputs
-    printf("Enter filename: ");
-    scanf("%s", filename);
+        Kmeans(k, n, d, maxIter, filename);
+    }
+    else {
+        printf("Usage: %s <k> <n> <d> [maxIter] <filename>\n", argv[0]);
+        return 1;
+    }
 
-    printf("Enter value of k: ");
-    scanf("%d", &k);
-
-    printf("Enter value of n: ");
-    scanf("%d", &n);
-
-    printf("Enter value of d: ");
-    scanf("%d", &d);
-
-    printf("Enter value of maxIter: ");
-    scanf("%d", &maxIter);
-
-    // Call Kmeans function with user-provided inputs
-    Kmeans(filename, k, n, d, maxIter);
-    
     return 0;
 }

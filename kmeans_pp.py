@@ -39,7 +39,7 @@ def inner_join(file_name_1, file_name_2):
 
 
 def initialize_centroid(vector_list: np.ndarray) -> np.ndarray:
-    
+
 
 
 if __name__ == "__main__":
