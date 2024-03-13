@@ -1,7 +1,7 @@
 from setuptools import Extension, setup
 
-module = Extension("capi_demo1", sources=['geo.c', 'geomodule.c'])
-setup(name='capi_demo1',
-      version='1.0',
-      description='Python wrapper for custom C extension',
-      ext_modules=[module])
+module = Extension("geo_capi", sources=['geomodule.c'])
+setup(name='geo_capi',
+     version='1.0',
+     description='Python wrapper for custom C extension',
+     ext_modules=[module])

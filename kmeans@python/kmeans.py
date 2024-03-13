@@ -1,4 +1,5 @@
 from Vector import Vector
+import sys
 
 
 def kmeans(input_data: str, k: int, n: int, d: int, max_iter=200):
@@ -140,3 +141,25 @@ def is_converged(centroids_list: list, updated_centroids_list: list) -> bool:
         if not centroids_list[index].__eq__(updated_centroids_list[index]):
             return False
     return True
+
+
+def main():
+    if len(sys.argv) < 5:
+        print("Usage: python script.py k n d [iter] file_name")
+        return
+
+    k = int(sys.argv[1])
+    n = int(sys.argv[2])
+    d = int(sys.argv[3])
+
+    if len(sys.argv) > 5:
+        max_iter = int(sys.argv[4])
+        file_name = sys.argv[5]
+        kmeans(input_data=file_name, k=k, n=n, d=d, max_iter=max_iter)
+    else:
+        file_name = sys.argv[4]
+        kmeans(input_data=file_name, k=k, n=n, d=d)
+
+
+if __name__ == "__main__":
+    main()
