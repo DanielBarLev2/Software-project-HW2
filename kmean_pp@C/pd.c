@@ -64,36 +64,40 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
     vectorList = parsePyListToVectorArray(pyVectorList, n, d);
     centroidList = parsePyListToVectorArray(pyCentroidList, k, d);
 
-    centroidList = Kmeans(vectorList, centroidList, k, n, d, iter);
+    Kmeans(vectorList, centroidList, k, n, d, iter);
 
     /* Clean up allocated memory */
     for (int i = 0; i < n; i++) {
         free(vectorList[i].components);
     }
     free(vectorList);
-    for (int i = 0; i < k; i++) {
-        free(centroidList[i].components);
-    }
-    free(centroidList);
 
     return Py_BuildValue("(O)", centroidList);
 }
 
 /* Method definitions */
 static PyMethodDef myModule_methods[] = {
-    {"my_c_function", fit_c, METH_VARARGS, "Receives two lists of vectors and dimensions N, K, D."},
-    {NULL, NULL, 0, NULL}   /* Sentinel */
+    {"fit",
+     fit_c,
+     METH_VARARGS,
+     PyDoc_STR("Receives two lists of vectors and dimensions k, n, d, iter.")},
+    {NULL, NULL, 0, NULL}
 };
 
 /* Module initialization */
 static struct PyModuleDef myModule_definition = {
     PyModuleDef_HEAD_INIT,
-    "myModule",
-    "A Python module that receives two lists of vectors and dimensions N, K, D.",
+    "mykmeanssp",
+    "A Python module that receives two lists of vectors and dimensions k, n, d, iter.",
     -1,
     myModule_methods
 };
 
-PyMODINIT_FUNC PyInit_myModule(void) {
-    return PyModule_Create(&myModule_definition);
+PyMODINIT_FUNC PyInit_mykmeanssp(void) {
+    PyObject *m;
+    m = PyModule_Create(&myModule_definition);
+    if (!m){
+        return NULL;
+    }
+    return m;
 }

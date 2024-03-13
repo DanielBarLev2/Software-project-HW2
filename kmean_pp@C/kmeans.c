@@ -118,7 +118,7 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
     return true; 
 }
 
-Vector* Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
+void Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
     
     bool isValid;
     int iter, i, j;
@@ -144,6 +144,4 @@ Vector* Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, i
         printVector(centroidList[i]);
     }  
     printf("\n");
-
-    return centroidList;
 }
