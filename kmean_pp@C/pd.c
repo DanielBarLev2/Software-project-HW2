@@ -1,76 +1,87 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "vector.h" 
+#include "kmeans.c"
 
-static PyObject* fit(PyObject* self, PyObject* args) {
-    PyObject* dataframe;
-    PyObject* values;
-    PyObject* iterator;
-    PyObject* item;
-    PyObject* row;
-    PyObject* value;
-    Py_ssize_t num_cols;
-    double val;
-    Py_ssize_t j;
 
-    /* Parse the arguments from Python */
-    if (!PyArg_ParseTuple(args, "O", &dataframe)) {
+Vector* parsePyListToVectorArray(PyObject* pyList, int size, int dimension) {
+    Vector *vectorList;
+    int i, j;
+    double* values;
+    vectorList = (Vector*)malloc(size * sizeof(Vector));
+
+    if (!vectorList) {
+        PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for vector array");
         return NULL;
     }
 
-    /* Check if it's a DataFrame */
-    if (!PyObject_HasAttrString(dataframe, "values")) {
-        PyErr_SetString(PyExc_TypeError, "Expected a DataFrame");
-        return NULL;
-    }
-
-    /* Get the 'values' attribute of the DataFrame */
-    values = PyObject_GetAttrString(dataframe, "values");
-
-    /* Check if it's iterable */
-    if (!PyIter_Check(values)) {
-        PyErr_SetString(PyExc_TypeError, "Expected an iterable object");
-        Py_DECREF(values);
-        return NULL;
-    }
-
-    iterator = PyObject_GetIter(values);
-
-    /* Iterate over the DataFrame */
-    while ((item = PyIter_Next(iterator))) {
-        row = PySequence_Fast(item, "expected a sequence");
-        Py_DECREF(item);
-        if (!row) {
-            PyErr_SetString(PyExc_TypeError, "Expected a sequence of sequences");
-            Py_DECREF(iterator);
-            Py_DECREF(values);
+    for (i = 0; i < size; i++) {
+        PyObject* py_item = PyList_GetItem(pyList, i);
+        if (!PyList_Check(py_item) || PyList_Size(py_item) != dimension) {
+            PyErr_SetString(PyExc_ValueError, "Invalid vector format in input list");
+            free(vectorList);
             return NULL;
         }
-        num_cols = PySequence_Fast_GET_SIZE(row);
-        for (j = 0; j < num_cols; j++) {
-            value = PySequence_Fast_GET_ITEM(row, j);
-            val = PyFloat_AsDouble(value);
-            if (val == -1.0 && PyErr_Occurred()) {
-                PyErr_SetString(PyExc_TypeError, "Expected a DataFrame of floats");
-                Py_DECREF(row);
-                Py_DECREF(iterator);
-                Py_DECREF(values);
-                return NULL;
-            }
-            printf("Value at (%zd, %zd): %f\n", j, j, val);
+
+        values = (double*)malloc(dimension * sizeof(double));
+
+        if (!values) {
+            PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for vector components");
+            free(vectorList);
+            return NULL;
         }
-        Py_DECREF(row);
+
+        for (j = 0; j < dimension; j++) {
+            values[j] = PyFloat_AsDouble(PyList_GetItem(py_item, j));
+        }
+
+        vectorList[i] = createVector(dimension, values);
+        free(values);
     }
 
-    Py_DECREF(iterator);
-    Py_DECREF(values);
+    return vectorList;
+}
 
-    /* Return None */
-    Py_RETURN_NONE;
+static PyObject* fit_c(PyObject* self, PyObject* args) {
+    int k, n, d, iter;
+    PyObject *pyVectorList, *pyCentroidList;
+    Vector *vectorList, *centroidList;
+
+    /* type test */
+    if (!PyArg_ParseTuple(args, "O!O!iiii", &PyList_Type, &pyVectorList, &PyList_Type, &pyCentroidList, &k, &n, &d, &iter)) {
+        return NULL;
+    }
+
+    /* Check if the lengths of the Python lists match N and K */
+    if (PyList_Size(pyVectorList) != n || PyList_Size(pyCentroidList) != k) {
+        PyErr_SetString(PyExc_ValueError, "Input list sizes do not match the specified dimensions");
+        return NULL;
+    }
+
+    // Parse Python lists into vector arrays
+    vectorList = parsePyListToVectorArray(pyVectorList, n, d);
+    centroidList = parsePyListToVectorArray(pyCentroidList, k, d);
+
+    centroidList = Kmeans(vectorList, centroidList, k, n, d, iter);
+
+    /* Clean up allocated memory */
+    for (int i = 0; i < n; i++) {
+        free(vectorList[i].components);
+    }
+    free(vectorList);
+    for (int i = 0; i < k; i++) {
+        free(centroidList[i].components);
+    }
+    free(centroidList);
+
+    return Py_BuildValue("(O)", centroidList);
 }
 
 /* Method definitions */
 static PyMethodDef myModule_methods[] = {
-    {"my_c_function", my_c_function, METH_VARARGS, "Receives a DataFrame."},
+    {"my_c_function", fit_c, METH_VARARGS, "Receives two lists of vectors and dimensions N, K, D."},
     {NULL, NULL, 0, NULL}   /* Sentinel */
 };
 
@@ -78,7 +89,7 @@ static PyMethodDef myModule_methods[] = {
 static struct PyModuleDef myModule_definition = {
     PyModuleDef_HEAD_INIT,
     "myModule",
-    "A Python module that receives a DataFrame.",
+    "A Python module that receives two lists of vectors and dimensions N, K, D.",
     -1,
     myModule_methods
 };

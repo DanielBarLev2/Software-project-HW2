@@ -1,101 +1,81 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "vector.h" 
 
-// Function to parse a Python list into a vector array
-Vector* parsePyListToVectorArray(PyObject* py_list, int size, int dimension) {
-    Vector* vec_array = (Vector*)malloc(size * sizeof(Vector));
-    if (!vec_array) {
-        PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for vector array");
-        return NULL;
+
+// Function to create a new Vector
+Vector createVector(int dimension, double *values) {
+    Vector vec;
+    vec.dimension = dimension;
+    vec.centroid = -1; // Initialize centroid to -1 (indicating not assigned)
+    
+    if (values == NULL)
+        vec.components = (double *)calloc(dimension, sizeof(double)); // Allocate memory for components
+    else {
+        vec.components = (double *)malloc(dimension * sizeof(double)); // Allocate memory for components
+        if (vec.components == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(EXIT_FAILURE);
+        }
+        // Copy values to components
+        for (int i = 0; i < dimension; i++) {
+            vec.components[i] = values[i];
+        }
     }
-
-    for (int i = 0; i < size; i++) {
-        PyObject* py_item = PyList_GetItem(py_list, i);
-        if (!PyList_Check(py_item) || PyList_Size(py_item) != dimension) {
-            PyErr_SetString(PyExc_ValueError, "Invalid vector format in input list");
-            free(vec_array);
-            return NULL;
-        }
-
-        double* values = (double*)malloc(dimension * sizeof(double));
-        if (!values) {
-            PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for vector components");
-            free(vec_array);
-            return NULL;
-        }
-
-        for (int j = 0; j < dimension; j++) {
-            values[j] = PyFloat_AsDouble(PyList_GetItem(py_item, j));
-        }
-
-        vec_array[i] = createVector(dimension, values);
-        free(values);
-    }
-
-    return vec_array;
+    return vec;
 }
 
-static PyObject* my_c_function(PyObject* self, PyObject* args) {
-    int N, K, D;
-    PyObject *py_array1, *py_array2;
-
-    /* Parse the arguments from Python */
-    if (!PyArg_ParseTuple(args, "O!O!iii", &PyList_Type, &py_array1, &PyList_Type, &py_array2, &N, &K, &D)) {
-        return NULL;
+// Function to perform vector addition
+Vector add(Vector vec1, Vector vec2) {
+    if (vec1.dimension != vec2.dimension) {
+        fprintf(stderr, "Vectors must have the same dimension for addition\n");
+        exit(EXIT_FAILURE);
     }
-
-    /* Check if the lengths of the Python lists match N and K */
-    if (PyList_Size(py_array1) != N || PyList_Size(py_array2) != K) {
-        PyErr_SetString(PyExc_ValueError, "Input list sizes do not match the specified dimensions");
-        return NULL;
+    
+    Vector result = createVector(vec1.dimension, NULL); // Create a result vector
+    // Perform addition component-wise
+    for (int i = 0; i < vec1.dimension; i++) {
+        result.components[i] = vec1.components[i] + vec2.components[i];
     }
-
-    // Parse Python lists into vector arrays
-    Vector* array1 = parsePyListToVectorArray(py_array1, N, D);
-    if (!array1) {
-        return NULL;
-    }
-
-    Vector* array2 = parsePyListToVectorArray(py_array2, K, D);
-    if (!array2) {
-        free(array1);
-        return NULL;
-    }
-
-    /* Your further processing with the arrays goes here... */
-
-    /* Clean up allocated memory */
-    for (int i = 0; i < N; i++) {
-        free(array1[i].components);
-    }
-    free(array1);
-    for (int i = 0; i < K; i++) {
-        free(array2[i].components);
-    }
-    free(array2);
-
-    /* Return the arrays */
-    return Py_BuildValue("(OO)", array1, array2);
+    return result;
 }
 
-/* Method definitions */
-static PyMethodDef myModule_methods[] = {
-    {"my_c_function", my_c_function, METH_VARARGS, "Receives two lists of vectors and dimensions N, K, D."},
-    {NULL, NULL, 0, NULL}   /* Sentinel */
-};
+// Function to perform scalar multiplication of a vector
+Vector multiplyScalar(Vector vec, double scalar) {
+    Vector result = createVector(vec.dimension, NULL); // Create a result vector
+    // Perform scalar multiplication component-wise
+    for (int i = 0; i < vec.dimension; i++) {
+        result.components[i] = vec.components[i] * scalar;
+    }
+    return result;
+}
 
-/* Module initialization */
-static struct PyModuleDef myModule_definition = {
-    PyModuleDef_HEAD_INIT,
-    "myModule",
-    "A Python module that receives two lists of vectors and dimensions N, K, D.",
-    -1,
-    myModule_methods
-};
+// Function to calculate the Euclidean distance between two vectors
+double euclidean_distance(Vector vec1, Vector vec2) {
+    if (vec1.dimension != vec2.dimension) {
+        fprintf(stderr, "Vectors must have the same dimension for calculating Euclidean distance\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    double sum = 0.0;
+    // Calculate the sum of squared differences component-wise
+    for (int i = 0; i < vec1.dimension; i++) {
+        double diff = vec1.components[i] - vec2.components[i];
+        sum += diff * diff;
+    }
+    return sqrt(sum); // Return the square root of the sum
+}
 
-PyMODINIT_FUNC PyInit_myModule(void) {
-    return PyModule_Create(&myModule_definition);
+// Function to print a Vector
+void printVector(Vector vec) {
+    printf("(");
+    // Print components
+    for (int i = 0; i < vec.dimension; i++) {
+        printf("%.4f", vec.components[i]);
+        if (i < vec.dimension - 1) {
+            printf(", ");
+        }
+    }
+    printf(")\n");
 }
