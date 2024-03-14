@@ -68,6 +68,11 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
 
     /* Clean up allocated memory */
     
+    for (int i = 0; i < n; i++) {
+        free(vectorList[i].components);
+    }
+    free(vectorList);
+
     return Py_BuildValue("(O)", centroidList);
 }
 
@@ -83,11 +88,17 @@ static PyMethodDef myModule_methods[] = {
 static struct PyModuleDef myModule_definition = {
     PyModuleDef_HEAD_INIT,
     "mykmeanssp",
-    "A Python module that receives two lists of vectors and dimensions N, K, D.",
+    "A Python module that receives two lists of vectors and dimensions k, n, d, iter.",
     -1,
     myModule_methods
 };
 
 PyMODINIT_FUNC PyInit_mykmeanssp(void) {
     return PyModule_Create(&myModule_definition);
+    PyObject *m;
+    m = PyModule_Create(&myModule_definition);
+    if (!m){
+        return NULL;
+    }
+    return m;
 }

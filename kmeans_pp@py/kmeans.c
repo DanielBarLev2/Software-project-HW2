@@ -118,7 +118,11 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
     return true; 
 }
 
+<<<<<<< HEAD:kmeans_pp@py/kmeans.c
 void* Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
+=======
+void Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
+>>>>>>> 7f4cec8e87b1763147312b4b936a48affc6e6f3a:kmean_pp@C/kmeans.c
     
     bool isValid;
     int iter, i, j;
@@ -144,5 +148,8 @@ void* Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int
         printVector(centroidList[i]);
     }  
     printf("\n");
+<<<<<<< HEAD:kmeans_pp@py/kmeans.c
 
+=======
+>>>>>>> 7f4cec8e87b1763147312b4b936a48affc6e6f3a:kmean_pp@C/kmeans.c
 }
