@@ -15,7 +15,7 @@ typedef enum { false, true } bool;
 bool testValidation(int k, int n, int d, int max_iter);
 void computeMinDistance(Vector *vectorList, Vector *centroids_list, int k, int n);
 Vector* updateCentroids(Vector *vectorList, int n, int d, int k);
-bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k);
+bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k, float eps);
 Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter, float eps);
 
 
@@ -82,11 +82,11 @@ Vector* updateCentroids(Vector *vectorList, int n, int d, int k) {
     return updatedCentroidsList;
 }
 
-bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
+bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k, float eps) {
     int index, i;
     for (index = 0; index < k; index++) {
         for (i = 0; i < centroidsList[index].dimension; i++) {
-            if (centroidsList[index].components[i] != updatedCentroidsList[index].components[i]) {
+            if (fabs(centroidsList[index].components[i] - updatedCentroidsList[index].components[i]) > eps){ 
                 return false;
             }
         }
@@ -107,7 +107,7 @@ Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, in
         computeMinDistance(vectorList, centroidList, k, n); 
         updatedCentroidsList = updateCentroids(vectorList, n, d, k);
 
-        if (isConverged(centroidList, updatedCentroidsList, k)) {
+        if (isConverged(centroidList, updatedCentroidsList, k, eps)) {
             free(updatedCentroidsList);
             break;
         }

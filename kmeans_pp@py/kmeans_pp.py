@@ -134,10 +134,10 @@ def get_centroid_indices(data: pd.DataFrame, centroids_list: np.ndarray) -> list
 
 def kmeans():
     # to run in cmd use: main.py k n d "input++/input_1_db_1.txt" "input++/input_1_db_2.txt"
-    # k, iter, eps, file_name_1, file_name_2 = sys_arguments()
+    k, iter, eps, file_name_1, file_name_2 = sys_arguments()
 
     # to run internally:
-    k, iter, eps, file_name_1, file_name_2 = 15, 750, 0, "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_1.txt", "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_2.txt"
+    # k, iter, eps, file_name_1, file_name_2 = 15, 750, 0, "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_1.txt", "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_2.txt"
 
     data = inner_join(file_name_1, file_name_2)
     vectors_list = data.values
@@ -157,7 +157,7 @@ def kmeans():
         print("Invalid maximum iteration!")
         sys.exit(1)
 
-    if k < n:
+    if not 1 < k < n:
         print("Invalid maximum of clusters!")
         sys.exit(1)
 

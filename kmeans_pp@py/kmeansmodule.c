@@ -51,7 +51,7 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
     Vector *vectorList, *centroidList;
 
     /* type test */
-    if (!PyArg_ParseTuple(args, "O!O!iiii", &PyList_Type, &pyVectorList, &PyList_Type, &pyCentroidList, &k, &n, &d, &iter, &eps)) {
+    if (!PyArg_ParseTuple(args, "O!O!iiiif", &PyList_Type, &pyVectorList, &PyList_Type, &pyCentroidList, &k, &n, &d, &iter, &eps)) {
         return NULL;
     }
 
