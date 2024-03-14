@@ -151,8 +151,7 @@ def kmeans():
     d = len(vectors_list[0])
     centroids_list = mk.fit(vectors_list, centroids_list, k, n, d, iter)
     for centroid in centroids_list:
-        print(type(centroid))    
+        print(centroid)    
 
 if __name__ == "__main__":
-    print('TESTTTTT')
     kmeans()

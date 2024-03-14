@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
 #include "vector.h"
 #include "vector.c"
+
 #define INF 999999999999
 #define MAX_ROW_LEN 512
 
@@ -16,6 +16,8 @@ bool testValidation(int k, int n, int d, int max_iter);
 void computeMinDistance(Vector *vectorList, Vector *centroids_list, int k, int n);
 Vector* updateCentroids(Vector *vectorList, int n, int d, int k);
 bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k);
+Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter);
+
 
 bool testValidation(int k, int n, int d, int max_iter) {
     if (!(1 < k && k < n)) {
@@ -118,11 +120,7 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
     return true; 
 }
 
-<<<<<<< HEAD:kmeans_pp@py/kmeans.c
-void* Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
-=======
-void Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
->>>>>>> 7f4cec8e87b1763147312b4b936a48affc6e6f3a:kmean_pp@C/kmeans.c
+Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
     
     bool isValid;
     int iter, i, j;
@@ -143,13 +141,5 @@ void Kmeans( Vector *vectorList, Vector *centroidList, int k, int n, int d, int 
         free(centroidList);
         centroidList = updatedCentroidsList;
     }
-
-    for (i = 0; i < k; i++) {
-        printVector(centroidList[i]);
-    }  
-    printf("\n");
-<<<<<<< HEAD:kmeans_pp@py/kmeans.c
-
-=======
->>>>>>> 7f4cec8e87b1763147312b4b936a48affc6e6f3a:kmean_pp@C/kmeans.c
+    return centroidList;
 }

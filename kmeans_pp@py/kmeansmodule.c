@@ -45,8 +45,8 @@ Vector* parsePyListToVectorArray(PyObject* pyList, int size, int dimension) {
 }
 
 static PyObject* fit_c(PyObject* self, PyObject* args) {
-    int k, n, d, iter;
-    PyObject *pyVectorList, *pyCentroidList;
+    int k, n, d, iter, i, j;
+    PyObject *pyVectorList, *pyCentroidList, *pyCentroidListObj, *pyVectorObj;
     Vector *vectorList, *centroidList;
 
     /* type test */
@@ -64,16 +64,37 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
     vectorList = parsePyListToVectorArray(pyVectorList, n, d);
     centroidList = parsePyListToVectorArray(pyCentroidList, k, d);
 
-    Kmeans(vectorList, centroidList, k, n, d, iter);
+    
+    printf("\n");
 
+    centroidList = Kmeans(vectorList, centroidList, k, n, d, iter);
+
+    for (i = 0; i < k; i++) {
+        printVector(centroidList[i]);
+    }  
+    
     /* Clean up allocated memory */
     
-    for (int i = 0; i < n; i++) {
-        free(vectorList[i].components);
-    }
-    free(vectorList);
+    // for (i = 0; i < n; i++) {
+    //     free(vectorList[i].components);
+    // }
+    // free(vectorList);
 
-    return Py_BuildValue("(O)", centroidList);
+    pyCentroidListObj = PyList_New(k);
+    for (i = 0; i < k; i++) {
+        pyVectorObj = PyList_New(d);
+        for (j = 0; j < d; j++) {
+            printf("%d, %d :", i, j);
+            printf("\n");
+            PyList_SetItem(pyVectorObj, j, PyFloat_FromDouble(centroidList[i].components[j]));
+        }
+        // Convert the tuple to a list
+        PyObject *pyListObj = PyList_New(1);
+        PyList_SetItem(pyListObj, 0, pyVectorObj);
+        PyList_SetItem(pyCentroidListObj, i, pyListObj);
+    }
+
+    return pyCentroidListObj;
 }
 
 /* Method definitions */
