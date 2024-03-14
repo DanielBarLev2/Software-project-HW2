@@ -45,12 +45,13 @@ Vector* parsePyListToVectorArray(PyObject* pyList, int size, int dimension) {
 }
 
 static PyObject* fit_c(PyObject* self, PyObject* args) {
+    float eps;
     int k, n, d, iter, i, j;
-    PyObject *pyVectorList, *pyCentroidList, *pyCentroidListObj, *pyVectorObj;
+    PyObject *pyVectorList, *pyCentroidList, *pyCentroidListObj, *pyVectorObj, *pyListObj;
     Vector *vectorList, *centroidList;
 
     /* type test */
-    if (!PyArg_ParseTuple(args, "O!O!iiii", &PyList_Type, &pyVectorList, &PyList_Type, &pyCentroidList, &k, &n, &d, &iter)) {
+    if (!PyArg_ParseTuple(args, "O!O!iiii", &PyList_Type, &pyVectorList, &PyList_Type, &pyCentroidList, &k, &n, &d, &iter, &eps)) {
         return NULL;
     }
 
@@ -60,36 +61,20 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    // Parse Python lists into vector arrays
+    /* Parse Python lists into vector arrays */
     vectorList = parsePyListToVectorArray(pyVectorList, n, d);
     centroidList = parsePyListToVectorArray(pyCentroidList, k, d);
 
-    
-    printf("\n");
-
-    centroidList = Kmeans(vectorList, centroidList, k, n, d, iter);
-
-    for (i = 0; i < k; i++) {
-        printVector(centroidList[i]);
-    }  
-    
-    /* Clean up allocated memory */
-    
-    // for (i = 0; i < n; i++) {
-    //     free(vectorList[i].components);
-    // }
-    // free(vectorList);
+    centroidList = Kmeans(vectorList, centroidList, k, n, d, iter, eps);
 
     pyCentroidListObj = PyList_New(k);
     for (i = 0; i < k; i++) {
         pyVectorObj = PyList_New(d);
         for (j = 0; j < d; j++) {
-            printf("%d, %d :", i, j);
-            printf("\n");
             PyList_SetItem(pyVectorObj, j, PyFloat_FromDouble(centroidList[i].components[j]));
         }
-        // Convert the tuple to a list
-        PyObject *pyListObj = PyList_New(1);
+        
+        pyListObj = PyList_New(1);
         PyList_SetItem(pyListObj, 0, pyVectorObj);
         PyList_SetItem(pyCentroidListObj, i, pyListObj);
     }
@@ -100,9 +85,10 @@ static PyObject* fit_c(PyObject* self, PyObject* args) {
 /* Method definitions */
 static PyMethodDef myModule_methods[] = {
     {"fit",
-     fit_c, METH_VARARGS,
-     "Receives two lists of vectors and dimensions N, K, D."},
-    {NULL, NULL, 0, NULL}   /* Sentinel */
+      (PyCFunction) fit_c,
+      METH_VARARGS,
+    PyDoc_STR("Receives two lists of vectors and dimensions k, n, d and iter.")},
+    {NULL, NULL, 0, NULL}
 };
 
 /* Module initialization */

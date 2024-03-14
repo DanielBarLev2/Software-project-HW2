@@ -137,21 +137,35 @@ def kmeans():
     # k, iter, eps, file_name_1, file_name_2 = sys_arguments()
 
     # to run internally:
-    k, iter, eps, file_name_1, file_name_2 = 3, 0, 0, "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_1_db_1.txt", "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_1_db_2.txt"
+    k, iter, eps, file_name_1, file_name_2 = 15, 750, 0, "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_1.txt", "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_3_db_2.txt"
 
     data = inner_join(file_name_1, file_name_2)
     vectors_list = data.values
     centroids_list = initialize_centroid(vectors_list=vectors_list, k=k)
     centroid_indices = get_centroid_indices(data, centroids_list)
     centroid_indices_str = ', '.join(map(str, centroid_indices))
+
     print(centroid_indices_str)
+
     vectors_list = vectors_list.tolist()
     centroids_list = centroids_list.tolist()
+
     n = len(vectors_list)
     d = len(vectors_list[0])
-    centroids_list = mk.fit(vectors_list, centroids_list, k, n, d, iter)
+
+    if not 1 < iter <1000:
+        print("Invalid maximum iteration!")
+        sys.exit(1)
+
+    if k < n:
+        print("Invalid maximum of clusters!")
+        sys.exit(1)
+
+    centroids_list = mk.fit(vectors_list, centroids_list, k, n, d, iter, eps)
+
     for centroid in centroids_list:
-        print(centroid)    
+        for sublist in centroid:
+            print(",".join("{:.4f}".format(num) for num in sublist))
 
 if __name__ == "__main__":
     kmeans()

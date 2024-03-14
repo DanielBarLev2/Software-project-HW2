@@ -16,33 +16,7 @@ bool testValidation(int k, int n, int d, int max_iter);
 void computeMinDistance(Vector *vectorList, Vector *centroids_list, int k, int n);
 Vector* updateCentroids(Vector *vectorList, int n, int d, int k);
 bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k);
-Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter);
-
-
-bool testValidation(int k, int n, int d, int max_iter) {
-    if (!(1 < k && k < n)) {
-        printf("k is %d and n is %d", k, n);
-        printf("Invalid number of clusters!\n");
-        return false;
-    }
-
-    if (n < 1) {
-        printf("Invalid number of points!\n");
-        return false;
-    }
-
-    if (d < 1) {
-        printf("Invalid dimension of point!\n");
-        return false;
-    }
-
-    if (!(1 < max_iter && max_iter < 1000)) {
-        printf("Invalid maximum iteration!\n");
-        return false;
-    }
-
-    return true;
-}
+Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter, float eps);
 
 
 void computeMinDistance(Vector *vectorList, Vector *centroidsList, int k, int n) {
@@ -120,8 +94,8 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k) {
     return true; 
 }
 
-Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter) {
-    
+
+Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter, float eps) {
     bool isValid;
     int iter, i, j;
     Vector *updatedCentroidsList;
@@ -141,5 +115,6 @@ Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, in
         free(centroidList);
         centroidList = updatedCentroidsList;
     }
+
     return centroidList;
 }
