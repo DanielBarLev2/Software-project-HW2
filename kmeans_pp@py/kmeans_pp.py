@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 import numpy as np
 import sys
-
+import mykmeanssp as mk
 
 def sys_arguments():
     """
@@ -62,8 +63,8 @@ def inner_join(file_name_1: str, file_name_2: str) -> pd.DataFrame:
     data2 = pd.read_csv(file_name_2, header=None)
 
     data = pd.merge(data1, data2, on=data1.columns[0], how='inner')
-    data.sort_values(by=0)
-    data = data[data.columns[1:]]
+    data = data.set_index(0)  # Set the first column as index
+    data.sort_index(inplace=True)  # Sort by index
 
     return data
 
@@ -112,22 +113,46 @@ def initialize_centroid(vectors_list, k: int) -> np.ndarray:
 
     return np.array(centroids_list)
 
+def get_centroid_indices(data: pd.DataFrame, centroids_list: np.ndarray) -> list:
+    """
+    Finds the original indices of the centroids in the data.
+
+    Parameters:
+        data (pd.DataFrame): A pandas DataFrame containing the data.
+        centroids_list (np.ndarray): An array containing the centroids.
+
+    Returns:
+        list: A list containing the original indices of the centroids.
+    """
+    centroid_indices = []
+    for centroid in centroids_list:
+        centroid_index = data.index[np.where((data.values == centroid).all(axis=1))][0]  # Get the index value
+        centroid_index = int(centroid_index)  # Convert to integer
+        centroid_indices.append(centroid_index)
+    return centroid_indices
+
 
 def kmeans():
     # to run in cmd use: main.py k n d "input++/input_1_db_1.txt" "input++/input_1_db_2.txt"
     # k, iter, eps, file_name_1, file_name_2 = sys_arguments()
 
     # to run internally:
-    k, iter, eps, file_name_1, file_name_2 = 3, 0, 0, "input++/input_1_db_1.txt", "input++/input_1_db_2.txt"
+    k, iter, eps, file_name_1, file_name_2 = 3, 0, 0, "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_1_db_1.txt", "/a/home/cc/students/cs/matant2/NEW/Software-project-HW2/inputs++/input_1_db_2.txt"
 
     data = inner_join(file_name_1, file_name_2)
-
     vectors_list = data.values
-
     centroids_list = initialize_centroid(vectors_list=vectors_list, k=k)
-
-    print(centroids_list)
-
+    centroid_indices = get_centroid_indices(data, centroids_list)
+    centroid_indices_str = ', '.join(map(str, centroid_indices))
+    print(centroid_indices_str)
+    vectors_list = vectors_list.tolist()
+    centroids_list = centroids_list.tolist()
+    n = len(vectors_list)
+    d = len(vectors_list[0])
+    centroids_list = mk.fit(vectors_list, centroids_list, k, n, d, iter)
+    for centroid in centroids_list:
+        print(type(centroid))    
 
 if __name__ == "__main__":
+    print('TESTTTTT')
     kmeans()
