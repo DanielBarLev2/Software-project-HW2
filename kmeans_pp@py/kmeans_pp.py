@@ -26,18 +26,21 @@ def sys_arguments():
         print("not enough arguments")
         sys.exit(1)
 
+    argc = len(sys.argv)
+
     try:
         k = int(sys.argv[1])
-        if len(sys.argv) > 2:
+
+        if argc > 5:
             iter = int(sys.argv[2])
+            eps = float(sys.argv[3])
+            file_name_1 = sys.argv[4]
+            file_name_2 = sys.argv[5]
         else:
             iter = 300
-        if len(sys.argv) > 3:
-            eps = float(sys.argv[3])
-        else:
-            eps = 1.1
-        file_name_1 = sys.argv[4]
-        file_name_2 = sys.argv[5]
+            eps = float(sys.argv[2])
+            file_name_1 = sys.argv[3]
+            file_name_2 = sys.argv[4]
 
     except ValueError:
         print("Invalid arguments")
@@ -143,9 +146,7 @@ def kmeans():
     vectors_list = data.values
     centroids_list = initialize_centroid(vectors_list=vectors_list, k=k)
     centroid_indices = get_centroid_indices(data, centroids_list)
-    centroid_indices_str = ', '.join(map(str, centroid_indices))
-
-    print(centroid_indices_str)
+    centroid_indices_str = ','.join(map(str, centroid_indices))
 
     vectors_list = vectors_list.tolist()
     centroids_list = centroids_list.tolist()
@@ -153,13 +154,15 @@ def kmeans():
     n = len(vectors_list)
     d = len(vectors_list[0])
 
-    if not 1 < iter <1000:
+    if not 1 < k < n:
+        print("Invalid number of clusters!")
+        sys.exit(1)
+
+    if not 1 < iter < 1000:
         print("Invalid maximum iteration!")
         sys.exit(1)
 
-    if not 1 < k < n:
-        print("Invalid maximum of clusters!")
-        sys.exit(1)
+    print(centroid_indices_str)
 
     centroids_list = mk.fit(vectors_list, centroids_list, k, n, d, iter, eps)
 

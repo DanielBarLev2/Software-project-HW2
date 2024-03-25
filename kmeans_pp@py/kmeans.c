@@ -96,8 +96,7 @@ bool isConverged(Vector *centroidsList, Vector *updatedCentroidsList, int k, flo
 
 
 Vector* Kmeans(Vector *vectorList, Vector *centroidList, int k, int n, int d, int maxIter, float eps) {
-    bool isValid;
-    int iter, i, j;
+    int iter;
     Vector *updatedCentroidsList;
 
     if (maxIter <= 0)
