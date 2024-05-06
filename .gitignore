@@ -1,5 +1,3 @@
 /tests/
 /.vscode/
 /test/
-kmeans_pp@py/mykmeanssp.cpython-36m-x86_64-linux-gnu.so
-kmeans_pp@py/build
